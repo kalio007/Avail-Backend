@@ -4,6 +4,7 @@ mod database;
 
 
 use crate::lib::db_utils::{get_pool, AppState, DbActor};
+use crate::routes::services::get_users;
 use actix::SyncArbiter;
 use actix_web::{web::Data, App, HttpServer};
 use diesel::{
@@ -30,7 +31,7 @@ async fn main() -> std::io::Result<()> {
                 db: db_addr.clone(),
             }))
             .service(health_checker_handler)
-        // .service(fetch_users)
+            .service(get_users)
         // .service(fetch_user_articles)
         // .service(create_user_article)
     })
