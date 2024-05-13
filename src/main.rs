@@ -1,10 +1,9 @@
+mod database;
 mod lib;
 mod routes;
-mod database;
-
 
 use crate::lib::db_utils::{get_pool, AppState, DbActor};
-use crate::routes::services::get_users;
+use crate::routes::services::{create_user, create_user_article, get_user_articles, get_users, update_user};
 use actix::SyncArbiter;
 use actix_web::{web::Data, App, HttpServer};
 use diesel::{
@@ -18,7 +17,6 @@ use std::env;
 #[actix_web::main]
 async fn main() -> std::io::Result<()> {
     dotenv().ok();
-    env_logger::init();
     let db_url: String = env::var("DATABASE_URL").expect("DATABASE_URL must be set");
     let pool: Pool<ConnectionManager<PgConnection>> = get_pool(&db_url);
     println!("✅ Connection to the db is successful!");
@@ -32,8 +30,10 @@ async fn main() -> std::io::Result<()> {
             }))
             .service(health_checker_handler)
             .service(get_users)
-        // .service(fetch_user_articles)
-        // .service(create_user_article)
+            .service(create_user)
+            .service(update_user)
+            .service(get_user_articles)
+            .service(create_user_article)
     })
     .bind(("127.0.0.1", 8080))?
     .run()
